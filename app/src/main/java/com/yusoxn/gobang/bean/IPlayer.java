@@ -27,4 +27,15 @@ public interface IPlayer {
      * @return
      */
     boolean isAI();
+
+    /**
+     * 获取棋子颜色
+     * @return
+     */
+    int getChessColor();
+
+    /**
+     * 设置下棋位置
+     */
+    void setChessPosition(ChessPoint chessPosition);
 }

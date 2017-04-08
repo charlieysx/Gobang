@@ -10,7 +10,6 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 
-import com.yusoxn.gobang.GameControl;
 import com.yusoxn.gobang.R;
 import com.yusoxn.gobang.bean.ChessPoint;
 
@@ -23,7 +22,7 @@ import java.util.List;
  * Created by Yusxon on 17/3/4.
  */
 
-public class GameView extends View implements GameControl.OnViewListener {
+public class GameView extends View {
 
     /**
      * 棋盘宽度(由于棋盘是正方形,所以棋盘高度等于棋盘宽度)
@@ -248,33 +247,51 @@ public class GameView extends View implements GameControl.OnViewListener {
         }
     }
 
-    @Override
+    /**
+     * 添加棋子
+     *
+     * @param chessPoint
+     */
     public void addChessPoint(ChessPoint chessPoint) {
         if (null != chessPoint) {
             points.add(chessPoint);
         }
     }
 
-    @Override
+    /**
+     * 批量添加棋子
+     *
+     * @param chessPoints
+     */
     public void addChessPoints(List<ChessPoint> chessPoints) {
         if (null != chessPoints) {
             points.addAll(chessPoints);
         }
     }
 
-    @Override
+    /**
+     * 设置选择框位置
+     *
+     * @param selectPoint
+     */
     public void setSelectPoint(ChessPoint selectPoint) {
         if (null != selectPoint) {
             this.selectPoint = selectPoint;
         }
     }
 
-    @Override
+    /**
+     * 重画，在添加棋子等信息后需要调用该方法绘制
+     */
     public void reDraw() {
         invalidate();
     }
 
-    @Override
+    /**
+     * 获取行高
+     *
+     * @return
+     */
     public float getViewLineHeight() {
         return mLineHeight;
     }
