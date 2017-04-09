@@ -7,10 +7,12 @@ import java.util.List;
 import java.util.Random;
 
 /**
+ * AI玩家
+ * <p>
  * Created by Yusxon on 17/4/9.
  */
 
-public class ComputerPlayer extends Player {
+public class ComputerPlayer extends BasePlayer {
 
     public ComputerPlayer(String playerName, int color) {
         super(playerName, color);
@@ -20,9 +22,9 @@ public class ComputerPlayer extends Player {
     public ChessPoint getChessPosition() {
 
         List<ChessPoint> points = new ArrayList<>();
-        for(int i = 0;i < mBoard.length;++i) {
-            for(int j = 0;j < mBoard[i].length;++j) {
-                if(null == mBoard[i][j]) {
+        for (int i = 0; i < mBoard.length; ++i) {
+            for (int j = 0; j < mBoard[i].length; ++j) {
+                if (null == mBoard[i][j]) {
                     points.add(new ChessPoint(i, j, color));
                 }
             }

@@ -1,19 +1,21 @@
 package com.yusoxn.gobang.bean;
 
+import com.yusoxn.gobang.interfaces.IPlayer;
+
 /**
  * 通用玩家
  * <p>
  * Created by Yusxon on 17/4/8.
  */
 
-public class Player implements IPlayer {
+public class BasePlayer implements IPlayer {
 
     protected String playerName;
     protected int color;
     protected ChessPoint tempChessPoint;
     protected ChessPoint[][] mBoard;
 
-    public Player(String playerName, int color) {
+    public BasePlayer(String playerName, int color) {
         this.playerName = playerName;
         this.color = color;
     }

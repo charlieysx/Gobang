@@ -8,7 +8,7 @@ import android.util.Log;
  * Created by Yusxon on 17/4/8.
  */
 
-public class HumanPlayer extends Player {
+public class HumanPlayer extends BasePlayer {
 
 
     public HumanPlayer(String playerName, int color) {

@@ -12,8 +12,8 @@ import android.widget.Toast;
 import com.yusoxn.gobang.bean.ChessPoint;
 import com.yusoxn.gobang.bean.ComputerPlayer;
 import com.yusoxn.gobang.bean.HumanPlayer;
-import com.yusoxn.gobang.bean.IPlayer;
-import com.yusoxn.gobang.bean.Player;
+import com.yusoxn.gobang.interfaces.IPlayer;
+import com.yusoxn.gobang.bean.BasePlayer;
 import com.yusoxn.gobang.view.GameView;
 
 public class MainActivity extends AppCompatActivity {
@@ -23,7 +23,7 @@ public class MainActivity extends AppCompatActivity {
 
     private GameControl mControl;
 
-    private Player[] players;
+    private BasePlayer[] players;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
 
         mControl = new GameControl(mGameView);
 
-        players = new Player[2];
+        players = new BasePlayer[2];
         players[0] = new HumanPlayer("小熊", ChessPoint.BLACK);
         players[1] = new ComputerPlayer("yusxon", ChessPoint.WHITE);
         mControl.setPlayers(players[0], players[1]);
@@ -73,17 +73,13 @@ public class MainActivity extends AppCompatActivity {
                     case MotionEvent.ACTION_DOWN:
                         float x = event.getX();
                         float y = event.getY();
-                        if(!mControl.calcRawXY(x, y)) {
+                        if(!mControl.clickXY(x, y)) {
                             String text = "AI下棋中";
                             if(btnStart.getVisibility() == View.VISIBLE) {
                                 text = "请先点击开始";
                             }
                             Toast.makeText(MainActivity.this, text, Toast.LENGTH_SHORT).show();
                         }
-                        break;
-                    case MotionEvent.ACTION_MOVE:
-                        break;
-                    case MotionEvent.ACTION_UP:
                         break;
                 }
 

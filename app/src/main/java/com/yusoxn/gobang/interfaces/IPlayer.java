@@ -1,4 +1,6 @@
-package com.yusoxn.gobang.bean;
+package com.yusoxn.gobang.interfaces;
+
+import com.yusoxn.gobang.bean.ChessPoint;
 
 /**
  * 玩家接口
