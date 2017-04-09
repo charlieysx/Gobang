@@ -2,12 +2,12 @@ package com.yusoxn.gobang;
 
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.Toast;
 
 import com.yusoxn.gobang.bean.ChessPoint;
 import com.yusoxn.gobang.bean.player.BasePlayer;
@@ -24,6 +24,8 @@ public class MainActivity extends AppCompatActivity {
     private GameControl mControl;
 
     private BasePlayer[] players;
+
+    private AlertDialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,9 +59,9 @@ public class MainActivity extends AppCompatActivity {
                     public void run() {
                         btnStart.setVisibility(View.VISIBLE);
                         if (null == winner) {
-                            Toast.makeText(MainActivity.this, "和棋", Toast.LENGTH_SHORT).show();
+                            showDialog("游戏结束", "和棋");
                         } else {
-                            Toast.makeText(MainActivity.this, winner.getPlayerName() + "赢", Toast.LENGTH_SHORT).show();
+                            showDialog("游戏结束", winner.getPlayerName() + "赢");
                         }
                     }
                 });
@@ -78,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
                             if(btnStart.getVisibility() == View.VISIBLE) {
                                 text = "请先点击开始";
                             }
-                            Toast.makeText(MainActivity.this, text, Toast.LENGTH_SHORT).show();
+                            showDialog("提示", text);
                         }
                         break;
                 }
@@ -93,5 +95,18 @@ public class MainActivity extends AppCompatActivity {
                 mControl.start();
             }
         });
+    }
+
+    private void showDialog(String title, String message) {
+        if(null != dialog && dialog.isShowing()) {
+            return;
+        }
+        if(null == dialog) {
+            dialog = new AlertDialog.Builder(this).create();
+        }
+        dialog.setTitle(title);
+        dialog.setMessage(message);
+
+        dialog.show();
     }
 }

@@ -43,24 +43,25 @@ public class ComputerPlayer extends BasePlayer {
         for (int i = 0; i < mBoard.length; ++i) {
             for (int j = 0; j < mBoard[i].length; ++j) {
                 if (mBoard[i][j] == ChessPoint.NULL) {
-                    int score = getScore(i, j, color);
-                    if(score == EvaluateUtil.MAXEVALUATE) {
+                    int score1 = getScore(i, j, color);
+                    if(score1 == EvaluateUtil.MAXEVALUATE) {
                         return new ChessPoint(i, i, color);
                     }
-                    if(maxScore < score) {
-                        maxScore = score;
+                    if(maxScore < score1) {
+                        maxScore = score1;
                         goodPos.clear();
                         goodPos.add(new ChessPoint(i, j, color));
+                    } else if(maxScore == score1) {
+                        goodPos.add(new ChessPoint(i, j, color));
                     }
-                    score = getScore(i, j, -color);
-                    if(score == EvaluateUtil.MAXEVALUATE) {
-                        return new ChessPoint(i, i, color);
-                    }
-                    if(maxScore < score) {
-                        maxScore = score;
+
+                    int score2 = getScore(i, j, -color);
+
+                    if(maxScore < score2) {
+                        maxScore = score2;
                         goodPos.clear();
                         goodPos.add(new ChessPoint(i, j, color));
-                    } else if(maxScore == score) {
+                    } else if(maxScore == score2) {
                         goodPos.add(new ChessPoint(i, j, color));
                     }
                 }
@@ -78,7 +79,7 @@ public class ComputerPlayer extends BasePlayer {
         return true;
     }
 
-    private int getScore(int x, int y, int tcolor) {
+    private int getScore(int x, int y, int tColor) {
         int score = 0;
 
         for (int i = 0; i < 8; i += 2) {
@@ -86,6 +87,10 @@ public class ComputerPlayer extends BasePlayer {
             int dis = 1;
             //表示两端的空格数
             int lrm = 2;
+            //记录该线上能放tColor和已放tColor的棋子个数，直到不能放为止
+            int cou = 1;
+            //记录是否遇到空格了
+            boolean space = false;
             //分别检测同一线上的两个方向
             int tx = x;
             int ty = y;
@@ -93,13 +98,15 @@ public class ComputerPlayer extends BasePlayer {
                 tx += dir[i][0];
                 ty += dir[i][1];
                 if(tx >= 0 && tx < 15 && ty >= 0 && ty < 15) {
-                    if(mBoard[tx][ty] == tcolor) {
+                    cou++;
+                    if(mBoard[tx][ty] == tColor && !space) {
                         dis++;
                     } else if(mBoard[tx][ty] != ChessPoint.NULL) {
                         lrm--;
+                        cou--;
                         break;
                     } else {
-                        break;
+                        space = true;
                     }
                 } else {
                     lrm--;
@@ -108,24 +115,30 @@ public class ComputerPlayer extends BasePlayer {
             }
             tx = x;
             ty = y;
+            space = false;
             for(int j = 0;j < 4;++j) {
                 tx += dir[i + 1][0];
                 ty += dir[i + 1][1];
                 if(tx >= 0 && tx < 15 && ty >= 0 && ty < 15) {
-                    if(mBoard[tx][ty] == tcolor) {
+                    cou++;
+                    if(mBoard[tx][ty] == tColor && !space) {
                         dis++;
                     } else if(mBoard[tx][ty] != ChessPoint.NULL) {
                         lrm--;
+                        cou--;
                         break;
                     } else {
-                        break;
+                        space = true;
                     }
                 } else {
                     lrm--;
                     break;
                 }
             }
-            score += EvaluateUtil.getEvaluate(dis, lrm);
+            //如果小于5说明这条线怎么放都不能凑成5个，所以不得分
+            if(cou >= 5) {
+                score += EvaluateUtil.getEvaluate(dis, lrm) + tColor * 10;
+            }
         }
 
         return score;

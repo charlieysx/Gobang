@@ -16,10 +16,10 @@ public class EvaluateUtil {
     public static void init() {
         evaluates = new SparseArray<>();
 
-        evaluates.append(1, new Integer[]{0, 1, 5});
-        evaluates.append(2, new Integer[]{0, 100, 300});
-        evaluates.append(3, new Integer[]{0, 1200, 3000});
-        evaluates.append(4, new Integer[]{0, 12000, 30000});
+        evaluates.append(1, new Integer[]{0, 1, 110});
+        evaluates.append(2, new Integer[]{0, 120, 1200});
+        evaluates.append(3, new Integer[]{0, 1100, 2200});
+        evaluates.append(4, new Integer[]{0, 2100, 90000});
     }
 
     public static int getEvaluate(int dis, int lrm) {
