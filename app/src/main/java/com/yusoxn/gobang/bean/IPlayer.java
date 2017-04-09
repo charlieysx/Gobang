@@ -30,6 +30,7 @@ public interface IPlayer {
 
     /**
      * 获取棋子颜色
+     *
      * @return
      */
     int getChessColor();
@@ -38,4 +39,11 @@ public interface IPlayer {
      * 设置下棋位置
      */
     void setChessPosition(ChessPoint chessPosition);
+
+    /**
+     * 设置当前棋盘状态
+     *
+     * @param board
+     */
+    void setChessBoard(ChessPoint[][] board);
 }

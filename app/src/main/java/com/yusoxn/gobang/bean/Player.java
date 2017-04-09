@@ -11,6 +11,7 @@ public class Player implements IPlayer {
     protected String playerName;
     protected int color;
     protected ChessPoint tempChessPoint;
+    protected ChessPoint[][] mBoard;
 
     public Player(String playerName, int color) {
         this.playerName = playerName;
@@ -40,5 +41,10 @@ public class Player implements IPlayer {
     @Override
     public void setChessPosition(ChessPoint chessPosition) {
         tempChessPoint = new ChessPoint(chessPosition.x, chessPosition.y, chessPosition.color);
+    }
+
+    @Override
+    public void setChessBoard(ChessPoint[][] board) {
+        this.mBoard = board;
     }
 }

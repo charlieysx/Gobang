@@ -93,24 +93,30 @@ public class GameControl {
         new Thread() {
             @Override
             public void run() {
-                gameOver = false;
-                while (!gameOver) {
+                while (true) {
+                    //获取当前玩家接口
                     IPlayer player = mPlayers[currentPlayer];
+                    ChessPoint point;
                     if (player.isAI()) {
-                        ChessPoint point = player.getChessPosition();
+                        player.setChessBoard(board);
+                        point = player.getChessPosition();
+                        board[point.x][point.y] = point;
                         mGameView.addChessPoint(point);
                         mGameView.setSelectPoint(point);
-                        isGameOver(point);
+                        points.add(point);
                     } else {
-                        ChessPoint point = player.getChessPosition();
+                        point = player.getChessPosition();
                         mGameView.addChessPoint(point);
-                        isGameOver(point);
                     }
-                    //进行异或运算，1变为0，0变为1
-                    currentPlayer ^= 1;
+                    //发送消息绘制棋盘信息
                     mHandler.sendEmptyMessage(0);
+                    //判断游戏是否结束
+                    if(isGameOver(point)) {
+                        break;
+                    }
+                    //进行异或运算，1变为0，0变为1(即切换玩家)
+                    currentPlayer ^= 1;
                 }
-                mGameListener.onGameOver(mPlayers[currentPlayer]);
             }
         }.start();
     }
@@ -146,6 +152,11 @@ public class GameControl {
      * @param point return
      */
     private boolean isGameOver(ChessPoint point) {
+        Log.i("GameControl", points.size() + "----");
+        if(points.size() == 225) {
+            mGameListener.onGameOver(null);
+            return true;
+        }
         return false;
     }
 
@@ -165,6 +176,7 @@ public class GameControl {
             } else if (null == board[rawX][rawY]) {
                 board[rawX][rawY] = new ChessPoint(rawX, rawY, mPlayers[currentPlayer].getChessColor());
                 mGameView.addChessPoint(board[rawX][rawY]);
+                points.add(board[rawX][rawY]);
                 mPlayers[currentPlayer].setChessPosition(board[rawX][rawY]);
             }
         }

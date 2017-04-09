@@ -9,8 +9,10 @@ import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.yusoxn.gobang.bean.ChessPoint;
+import com.yusoxn.gobang.bean.ComputerPlayer;
 import com.yusoxn.gobang.bean.HumanPlayer;
 import com.yusoxn.gobang.bean.IPlayer;
+import com.yusoxn.gobang.bean.Player;
 import com.yusoxn.gobang.view.GameView;
 
 public class MainActivity extends AppCompatActivity {
@@ -19,7 +21,7 @@ public class MainActivity extends AppCompatActivity {
 
     private GameControl mControl;
 
-    private HumanPlayer[] players;
+    private Player[] players;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,9 +37,9 @@ public class MainActivity extends AppCompatActivity {
         mGameView = (GameView) findViewById(R.id.gv_wuqizi);
         mControl = new GameControl(mGameView);
 
-        players = new HumanPlayer[2];
+        players = new Player[2];
         players[0] = new HumanPlayer("小熊", ChessPoint.BLACK);
-        players[1] = new HumanPlayer("yusxon", ChessPoint.WHITE);
+        players[1] = new ComputerPlayer("yusxon", ChessPoint.WHITE);
         mControl.setPlayers(players[0], players[1]);
         listener();
         mControl.start();
@@ -46,8 +48,17 @@ public class MainActivity extends AppCompatActivity {
     private void listener() {
         mControl.setOnGameListener(new GameControl.OnGameListener() {
             @Override
-            public void onGameOver(IPlayer winner) {
-                Toast.makeText(MainActivity.this, winner.getPlayerName() + "赢", Toast.LENGTH_SHORT).show();
+            public void onGameOver(final IPlayer winner) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (null == winner) {
+                            Toast.makeText(MainActivity.this, "和棋", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(MainActivity.this, winner.getPlayerName() + "赢", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
             }
         });
         mGameView.setOnTouchListener(new View.OnTouchListener() {

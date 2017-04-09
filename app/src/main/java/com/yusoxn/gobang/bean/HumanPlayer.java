@@ -18,8 +18,10 @@ public class HumanPlayer extends Player {
     @Override
     public ChessPoint getChessPosition() {
 
-        while (null == tempChessPoint) {
-
+        while (true) {
+            if(null != tempChessPoint) {
+                break;
+            }
         }
         Log.i("HumanPlayer", playerName + "下棋");
         ChessPoint pos = new ChessPoint(tempChessPoint.x, tempChessPoint.y, color);
