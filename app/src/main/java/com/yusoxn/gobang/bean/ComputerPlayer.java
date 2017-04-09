@@ -1,5 +1,7 @@
 package com.yusoxn.gobang.bean;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -25,6 +27,7 @@ public class ComputerPlayer extends Player {
                 }
             }
         }
+        Log.i("HumanPlayer", playerName + "下棋");
         Random random = new Random();
         int p = random.nextInt(points.size());
 

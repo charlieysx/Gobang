@@ -295,4 +295,13 @@ public class GameView extends View {
     public float getViewLineHeight() {
         return mLineHeight;
     }
+
+    /**
+     * 重置棋盘
+     */
+    public void resetChessBoard() {
+        points.clear();
+        selectPoint = null;
+        reDraw();
+    }
 }

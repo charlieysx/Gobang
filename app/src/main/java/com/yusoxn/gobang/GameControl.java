@@ -1,7 +1,7 @@
 package com.yusoxn.gobang;
 
-import android.os.Message;
 import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
@@ -38,6 +38,9 @@ public class GameControl {
 
     private int currentPlayer = 0;
 
+    /**
+     * 记录首次点击的位置(防止点错，需要点击同一位置两次才能下子)
+     */
     private ChessPoint firstClickPoint;
 
     /**
@@ -48,13 +51,15 @@ public class GameControl {
     /**
      * 存储该位置的棋子
      */
-    private ChessPoint[][] board;
+    private ChessPoint[][] mBoard;
 
-    private boolean gameOver = false;
+    private int[][] dir = {{-1, -1}, {1, 1}, {-1, 0}, {1, 0}, {-1, 1}, {1, -1}, {0, -1}, {0, 1}};
+
+    private boolean starting = false;
 
     public GameControl(@NonNull GameView gameView) {
         mGameView = gameView;
-        board = new ChessPoint[15][15];
+        mBoard = new ChessPoint[15][15];
     }
 
     /**
@@ -82,6 +87,18 @@ public class GameControl {
         return this;
     }
 
+    private void initBoard() {
+        mGameView.resetChessBoard();
+        if (null == firstClickPoint) {
+            firstClickPoint = new ChessPoint();
+        }
+        firstClickPoint.x = -1;
+        for(ChessPoint point : points) {
+            mBoard[point.x][point.y] = null;
+        }
+        points.clear();
+    }
+
     /**
      * 开始游戏
      */
@@ -90,6 +107,8 @@ public class GameControl {
                 mGameListener) {
             return;
         }
+        initBoard();
+        starting = true;
         new Thread() {
             @Override
             public void run() {
@@ -98,9 +117,9 @@ public class GameControl {
                     IPlayer player = mPlayers[currentPlayer];
                     ChessPoint point;
                     if (player.isAI()) {
-                        player.setChessBoard(board);
+                        player.setChessBoard(mBoard);
                         point = player.getChessPosition();
-                        board[point.x][point.y] = point;
+                        mBoard[point.x][point.y] = point;
                         mGameView.addChessPoint(point);
                         mGameView.setSelectPoint(point);
                         points.add(point);
@@ -111,7 +130,9 @@ public class GameControl {
                     //发送消息绘制棋盘信息
                     mHandler.sendEmptyMessage(0);
                     //判断游戏是否结束
-                    if(isGameOver(point)) {
+                    if (isGameOver(point)) {
+                        mGameListener.onGameOver(mPlayers[currentPlayer]);
+                        starting = false;
                         break;
                     }
                     //进行异或运算，1变为0，0变为1(即切换玩家)
@@ -130,55 +151,70 @@ public class GameControl {
     };
 
     /**
-     * 重新开始游戏
-     */
-    public void resume() {
-        currentPlayer = 0;
-        points.clear();
-    }
-
-    /**
-     * 悔棋
-     */
-    public void regret() {
-        //悔棋需要移除两步
-        points.remove(points.size());
-        points.remove(points.size());
-    }
-
-    /**
      * 检查下了该棋子后是否游戏结束
      *
      * @param point return
      */
     private boolean isGameOver(ChessPoint point) {
-        Log.i("GameControl", points.size() + "----");
-        if(points.size() == 225) {
+        if (points.size() == 225) {
             mGameListener.onGameOver(null);
             return true;
         }
+        Log.i("isGameOver", point.x + "---" + point.y + "---" + point.color);
+        int dis;
+        for (int i = 0; i < 8; i += 2) {
+            dis = 1;
+            int[] x = {point.x, point.x};
+            int[] y = {point.y, point.y};
+            while (true) {
+                int f = 0;
+                for (int j = 0; j < 2; ++j) {
+                    x[j] += dir[i + j][0];
+                    y[j] += dir[i + j][1];
+                    if (x[j] >= 0 && x[j] < 15 && y[j] >= 0 && y[j] < 15 && mBoard[x[j]][y[j]] != null &&
+                            mBoard[x[j]][y[j]].color == point.color) {
+                        dis++;
+                        if(dis >= 5) {
+                            return true;
+                        }
+                    } else {
+                        f += 1;
+                    }
+                }
+                if (f == 2) {
+                    break;
+                }
+            }
+            Log.i("isGameOver", dis + "---" + i);
+            if (dis >= 5) {
+                return true;
+            }
+        }
+
         return false;
     }
 
-    public void calcRawXY(float x, float y) {
+    public boolean calcRawXY(float x, float y) {
+        if (!starting) {
+            return false;
+        }
         if (!mPlayers[currentPlayer].isAI()) {
             int rawX = (int) (x / mGameView.getViewLineHeight());
             int rawY = (int) (y / mGameView.getViewLineHeight());
             mGameView.setSelectPoint(new ChessPoint(rawX, rawY, 0));
-            if (null == firstClickPoint || firstClickPoint.x != rawX || firstClickPoint.y != rawY) {
-                if (null == firstClickPoint) {
-                    firstClickPoint = new ChessPoint();
-                }
+            if (firstClickPoint.x != rawX || firstClickPoint.y != rawY) {
                 firstClickPoint.x = rawX;
                 firstClickPoint.y = rawY;
                 Log.i("GameControl", "点击");
                 mGameView.reDraw();
-            } else if (null == board[rawX][rawY]) {
-                board[rawX][rawY] = new ChessPoint(rawX, rawY, mPlayers[currentPlayer].getChessColor());
-                mGameView.addChessPoint(board[rawX][rawY]);
-                points.add(board[rawX][rawY]);
-                mPlayers[currentPlayer].setChessPosition(board[rawX][rawY]);
+            } else if (null == mBoard[rawX][rawY]) {
+                mBoard[rawX][rawY] = new ChessPoint(rawX, rawY, mPlayers[currentPlayer].getChessColor());
+                mGameView.addChessPoint(mBoard[rawX][rawY]);
+                points.add(mBoard[rawX][rawY]);
+                mPlayers[currentPlayer].setChessPosition(mBoard[rawX][rawY]);
             }
+            return true;
         }
+        return false;
     }
 }
