@@ -23,8 +23,6 @@ public class MainActivity extends AppCompatActivity {
 
     private GameControl mControl;
 
-    private BasePlayer[] players;
-
     private AlertDialog dialog;
 
     @Override
@@ -43,9 +41,9 @@ public class MainActivity extends AppCompatActivity {
 
         mControl = new GameControl(mGameView);
 
-        players = new BasePlayer[2];
-        players[0] = new HumanPlayer("小熊", ChessPoint.BLACK);
-        players[1] = new ComputerPlayer("yusxon", ChessPoint.WHITE);
+        BasePlayer[] players = new BasePlayer[2];
+        players[0] = new ComputerPlayer("小熊", ChessPoint.BLACK);
+        players[1] = new HumanPlayer("yusxon", ChessPoint.WHITE);
         mControl.setPlayers(players[0], players[1]);
         listener();
     }
