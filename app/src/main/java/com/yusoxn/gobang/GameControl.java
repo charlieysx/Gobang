@@ -8,8 +8,6 @@ import com.yusoxn.gobang.bean.ChessPoint;
 import com.yusoxn.gobang.interfaces.IPlayer;
 import com.yusoxn.gobang.view.GameView;
 
-import java.util.ArrayList;
-
 /**
  * 游戏控制器
  * <p>
@@ -43,14 +41,14 @@ public class GameControl {
     private ChessPoint firstClickPoint;
 
     /**
-     * 存储棋子坐标
+     * 已下的棋子数量
      */
-    private ArrayList<ChessPoint> points = new ArrayList<>();
+    private int numOfChess = 0;
 
     /**
      * 存储该位置的棋子
      */
-    private ChessPoint[][] mBoard;
+    private int[][] mBoard;
 
     /**
      * 可用于判断这些方向上的棋子
@@ -72,7 +70,7 @@ public class GameControl {
 
     public GameControl(@NonNull GameView gameView) {
         mGameView = gameView;
-        mBoard = new ChessPoint[15][15];
+        mBoard = new int[15][15];
     }
 
     /**
@@ -104,16 +102,18 @@ public class GameControl {
      * 初始化棋盘的信息
      */
     private void initBoard() {
+        numOfChess = 0;
         currentPlayer = 0;
         mGameView.resetChessBoard();
         if (null == firstClickPoint) {
             firstClickPoint = new ChessPoint();
         }
         firstClickPoint.x = -1;
-        for (ChessPoint point : points) {
-            mBoard[point.x][point.y] = null;
+        for(int i = 0;i < 15;++i) {
+            for(int j = 0;j < 15;++j) {
+                mBoard[i][j] = ChessPoint.NULL;
+            }
         }
-        points.clear();
     }
 
     /**
@@ -139,10 +139,10 @@ public class GameControl {
                     }
 
                     point = player.getChessPosition();
-                    mBoard[point.x][point.y] = point;
+                    mBoard[point.x][point.y] = point.color;
                     mGameView.addChessPoint(point);
                     mGameView.setSelectPoint(point);
-                    points.add(point);
+                    numOfChess++;
 
                     //发送消息绘制棋盘信息
                     mHandler.sendEmptyMessage(0);
@@ -172,40 +172,41 @@ public class GameControl {
      * @param point return
      */
     private boolean isGameOver(ChessPoint point) {
-        //计数用
-        int dis;
         for (int i = 0; i < 8; i += 2) {
-            //检查每个方向，开始为1，也就是它本身
-            dis = 1;
-            //因为同时检测同一线上的两个方向，所以需要用数组保存两个相同的起始坐标
-            int[] x = {point.x, point.x};
-            int[] y = {point.y, point.y};
+            //计数用，检查每个方向，开始为1，也就是它本身
+            int dis = 1;
+            //分别检测同一线上的两个方向
+            int x = point.x;
+            int y = point.y;
             while (true) {
-                //f标记那个方向不需要再继续向前检测
-                //即遇到空格或不是自己的棋子就不需要再继续向前了
-                //当两个方向都不能再检测时f就等于2，跳出循环
-                //dis大于等于5时代表该线上已经连成5子，跳出循环
-                int f = 0;
-                for (int j = 0; j < 2; ++j) {
-                    x[j] += dir[i + j][0];
-                    y[j] += dir[i + j][1];
-                    if (x[j] >= 0 && x[j] < 15 && y[j] >= 0 && y[j] < 15 && mBoard[x[j]][y[j]] != null &&
-                            mBoard[x[j]][y[j]].color == point.color) {
-                        dis++;
-                        if (dis >= 5) {
-                            return true;
-                        }
-                    } else {
-                        f += 1;
+                x += dir[i][0];
+                y += dir[i][1];
+                if(x >= 0 && x < 15 && y >= 0 && y < 15 && mBoard[x][y] == point.color) {
+                    dis++;
+                    if(dis == 5) {
+                        return true;
                     }
+                } else {
+                    break;
                 }
-                if (f == 2) {
+            }
+            x = point.x;
+            y = point.y;
+            while (true) {
+                x += dir[i + 1][0];
+                y += dir[i + 1][1];
+                if(x >= 0 && x < 15 && y >= 0 && y < 15 && mBoard[x][y] == point.color) {
+                    dis++;
+                    if(dis == 5) {
+                        return true;
+                    }
+                } else {
                     break;
                 }
             }
         }
         //如果棋子数为225，说明没有空格可以下了，表示和棋
-        if (points.size() == 225) {
+        if (numOfChess == 225) {
             mGameListener.onGameOver(null);
             return true;
         }
@@ -237,10 +238,12 @@ public class GameControl {
                 firstClickPoint.x = rawX;
                 firstClickPoint.y = rawY;
                 mGameView.reDraw();
-            } else if (null == mBoard[rawX][rawY]) {
+            } else if (mBoard[rawX][rawY] == ChessPoint.NULL) {
+                firstClickPoint.x = -1;
                 mPlayers[currentPlayer].setChessPosition(new ChessPoint(rawX, rawY, mPlayers[currentPlayer]
                         .getChessColor()));
             }
+
             return true;
         }
         return false;

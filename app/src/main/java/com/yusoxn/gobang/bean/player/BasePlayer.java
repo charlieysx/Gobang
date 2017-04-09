@@ -1,5 +1,6 @@
-package com.yusoxn.gobang.bean;
+package com.yusoxn.gobang.bean.player;
 
+import com.yusoxn.gobang.bean.ChessPoint;
 import com.yusoxn.gobang.interfaces.IPlayer;
 
 /**
@@ -13,7 +14,7 @@ public class BasePlayer implements IPlayer {
     protected String playerName;
     protected int color;
     protected ChessPoint tempChessPoint;
-    protected ChessPoint[][] mBoard;
+    protected int[][] mBoard;
 
     public BasePlayer(String playerName, int color) {
         this.playerName = playerName;
@@ -46,7 +47,7 @@ public class BasePlayer implements IPlayer {
     }
 
     @Override
-    public void setChessBoard(ChessPoint[][] board) {
+    public void setChessBoard(int[][] board) {
         this.mBoard = board;
     }
 }

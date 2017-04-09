@@ -47,5 +47,5 @@ public interface IPlayer {
      *
      * @param board
      */
-    void setChessBoard(ChessPoint[][] board);
+    void setChessBoard(int[][] board);
 }

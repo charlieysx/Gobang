@@ -7,7 +7,8 @@ package com.yusoxn.gobang.bean;
  */
 
 public class ChessPoint {
-    public static final int BLACK = 0;
+    public static final int NULL = 0;
+    public static final int BLACK = -1;
     public static final int WHITE = 1;
     public int color;
     public int x;

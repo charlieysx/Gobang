@@ -226,12 +226,15 @@ public class GameView extends View {
      *
      * @param canvas
      */
-    private void drawChess(Canvas canvas) {
-        for (ChessPoint point : points) {
+    private synchronized void drawChess(Canvas canvas) {
+        List<ChessPoint> tPoint = new ArrayList<>();
+        tPoint.addAll(points);
+        for (ChessPoint point : tPoint) {
             canvas.drawBitmap((point.color == ChessPoint.BLACK) ? mBlackChess : mWhiteChess,
                     (point.x + (1 - ChessScale) / 2) * mLineHeight,
                     (point.y + (1 - ChessScale) / 2) * mLineHeight, null);
         }
+        tPoint.clear();
     }
 
     /**
@@ -252,7 +255,7 @@ public class GameView extends View {
      *
      * @param chessPoint
      */
-    public void addChessPoint(ChessPoint chessPoint) {
+    public synchronized void addChessPoint(ChessPoint chessPoint) {
         if (null != chessPoint) {
             points.add(chessPoint);
         }
@@ -263,7 +266,7 @@ public class GameView extends View {
      *
      * @param chessPoints
      */
-    public void addChessPoints(List<ChessPoint> chessPoints) {
+    public synchronized void addChessPoints(List<ChessPoint> chessPoints) {
         if (null != chessPoints) {
             points.addAll(chessPoints);
         }
@@ -274,7 +277,7 @@ public class GameView extends View {
      *
      * @param selectPoint
      */
-    public void setSelectPoint(ChessPoint selectPoint) {
+    public synchronized void setSelectPoint(ChessPoint selectPoint) {
         if (null != selectPoint) {
             this.selectPoint = selectPoint;
         }

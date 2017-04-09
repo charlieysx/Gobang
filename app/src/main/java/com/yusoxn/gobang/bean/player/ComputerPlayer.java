@@ -1,6 +1,8 @@
-package com.yusoxn.gobang.bean;
+package com.yusoxn.gobang.bean.player;
 
 import android.util.Log;
+
+import com.yusoxn.gobang.bean.ChessPoint;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,12 +26,12 @@ public class ComputerPlayer extends BasePlayer {
         List<ChessPoint> points = new ArrayList<>();
         for (int i = 0; i < mBoard.length; ++i) {
             for (int j = 0; j < mBoard[i].length; ++j) {
-                if (null == mBoard[i][j]) {
+                if (mBoard[i][j] == ChessPoint.NULL) {
                     points.add(new ChessPoint(i, j, color));
                 }
             }
         }
-        Log.i("HumanPlayer", playerName + "下棋");
+        Log.i("Player", playerName + "下棋");
         Random random = new Random();
         int p = random.nextInt(points.size());
 
@@ -39,5 +41,13 @@ public class ComputerPlayer extends BasePlayer {
     @Override
     public boolean isAI() {
         return true;
+    }
+
+    private int getScore() {
+        int score = 0;
+
+
+
+        return score;
     }
 }
