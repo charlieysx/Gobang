@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 
 import com.yusoxn.gobang.bean.ChessPoint;
 import com.yusoxn.gobang.interfaces.IPlayer;
+import com.yusoxn.gobang.utils.EvaluateUtil;
 import com.yusoxn.gobang.view.GameView;
 
 /**
@@ -71,6 +72,7 @@ public class GameControl {
     public GameControl(@NonNull GameView gameView) {
         mGameView = gameView;
         mBoard = new int[15][15];
+        EvaluateUtil.init();
     }
 
     /**

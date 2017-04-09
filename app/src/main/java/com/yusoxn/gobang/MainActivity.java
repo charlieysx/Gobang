@@ -12,6 +12,7 @@ import android.widget.Toast;
 import com.yusoxn.gobang.bean.ChessPoint;
 import com.yusoxn.gobang.bean.player.BasePlayer;
 import com.yusoxn.gobang.bean.player.ComputerPlayer;
+import com.yusoxn.gobang.bean.player.HumanPlayer;
 import com.yusoxn.gobang.interfaces.IPlayer;
 import com.yusoxn.gobang.view.GameView;
 
@@ -41,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
         mControl = new GameControl(mGameView);
 
         players = new BasePlayer[2];
-        players[0] = new ComputerPlayer("小熊", ChessPoint.BLACK);
+        players[0] = new HumanPlayer("小熊", ChessPoint.BLACK);
         players[1] = new ComputerPlayer("yusxon", ChessPoint.WHITE);
         mControl.setPlayers(players[0], players[1]);
         listener();
