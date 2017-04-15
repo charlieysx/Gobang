@@ -3,6 +3,9 @@ package com.yusoxn.gobang.bean.player;
 import com.yusoxn.gobang.bean.ChessPoint;
 import com.yusoxn.gobang.interfaces.IPlayer;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * 通用玩家
  * <p>
@@ -15,6 +18,14 @@ public class BasePlayer implements IPlayer {
     protected int color;
     protected ChessPoint tempChessPoint;
     protected int[][] mBoard;
+    /**
+     * 存放我方的棋子
+     */
+    protected List<ChessPoint> mPosList = new ArrayList<>();
+    /**
+     * 存放对方的棋子
+     */
+    protected List<ChessPoint> ePosList = new ArrayList<>();
 
     public BasePlayer(String playerName, int color) {
         this.playerName = playerName;
@@ -47,7 +58,22 @@ public class BasePlayer implements IPlayer {
     }
 
     @Override
-    public void setChessBoard(int[][] board) {
-        this.mBoard = board;
+    public void setChessBoard(List<ChessPoint> chessList) {
+        mBoard = new int[15][15];
+        mPosList.clear();
+        ePosList.clear();
+        for(ChessPoint chess : chessList) {
+            mBoard[chess.x][chess.y] = chess.color;
+            if(chess.color == color) {
+                mPosList.add(new ChessPoint(chess.x, chess.y, color));
+            } else {
+                ePosList.add(new ChessPoint(chess.x, chess.y, chess.color));
+            }
+        }
+    }
+
+    @Override
+    public void initChessBoard() {
+        tempChessPoint = null;
     }
 }

@@ -9,6 +9,9 @@ import com.yusoxn.gobang.interfaces.IPlayer;
 import com.yusoxn.gobang.utils.EvaluateUtil;
 import com.yusoxn.gobang.view.GameView;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * 游戏控制器
  * <p>
@@ -50,6 +53,11 @@ public class GameControl {
      * 存储该位置的棋子
      */
     private int[][] mBoard;
+
+    /**
+     * 存放已下的棋子
+     */
+    private List<ChessPoint> mChessList = new ArrayList<>();
 
     /**
      * 可用于判断这些方向上的棋子
@@ -106,6 +114,7 @@ public class GameControl {
     private void initBoard() {
         numOfChess = 0;
         currentPlayer = 0;
+        mChessList.clear();
         mGameView.resetChessBoard();
         if (null == firstClickPoint) {
             firstClickPoint = new ChessPoint();
@@ -116,6 +125,8 @@ public class GameControl {
                 mBoard[i][j] = ChessPoint.NULL;
             }
         }
+        mPlayers[0].initChessBoard();
+        mPlayers[1].initChessBoard();
     }
 
     /**
@@ -137,10 +148,15 @@ public class GameControl {
                     ChessPoint point;
                     if (player.isAI()) {
                         //先把最新棋盘状态信息发给AI
-                        player.setChessBoard(mBoard);
+                        player.setChessBoard(mChessList);
                     }
-
-                    point = player.getChessPosition();
+                    //如果AI先手，则把棋子放在最中间
+                    if(player.isAI() && numOfChess == 0) {
+                        point = new ChessPoint(7, 7, player.getChessColor());
+                    } else {
+                        point = player.getChessPosition();
+                    }
+                    mChessList.add(0, point);
                     mBoard[point.x][point.y] = point.color;
                     mGameView.addChessPoint(point);
                     mGameView.setSelectPoint(point);
@@ -173,7 +189,7 @@ public class GameControl {
      *
      * @param point return
      */
-    private boolean isGameOver(ChessPoint point) {
+    private synchronized boolean isGameOver(ChessPoint point) {
         for (int i = 0; i < 8; i += 2) {
             //计数用，检查每个方向，开始为1，也就是它本身
             int dis = 1;

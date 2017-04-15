@@ -43,8 +43,8 @@ public class ComputerPlayer extends BasePlayer {
         for (int i = 0; i < mBoard.length; ++i) {
             for (int j = 0; j < mBoard[i].length; ++j) {
                 if (mBoard[i][j] == ChessPoint.NULL) {
-                    int score1 = getScore(i, j, color);
-                    if(score1 == EvaluateUtil.MAXEVALUATE) {
+                    int score1 = getScore(i, j, 1);
+                    if(score1 == EvaluateUtil.MAX_EVALUATE) {
                         return new ChessPoint(i, i, color);
                     }
                     if(maxScore < score1) {
@@ -55,7 +55,7 @@ public class ComputerPlayer extends BasePlayer {
                         goodPos.add(new ChessPoint(i, j, color));
                     }
 
-                    int score2 = getScore(i, j, -color);
+                    int score2 = getScore(i, j, -1);
 
                     if(maxScore < score2) {
                         maxScore = score2;
@@ -99,7 +99,7 @@ public class ComputerPlayer extends BasePlayer {
                 ty += dir[i][1];
                 if(tx >= 0 && tx < 15 && ty >= 0 && ty < 15) {
                     cou++;
-                    if(mBoard[tx][ty] == tColor && !space) {
+                    if(mBoard[tx][ty] == tColor * color && !space) {
                         dis++;
                     } else if(mBoard[tx][ty] != ChessPoint.NULL) {
                         lrm--;
@@ -121,7 +121,7 @@ public class ComputerPlayer extends BasePlayer {
                 ty += dir[i + 1][1];
                 if(tx >= 0 && tx < 15 && ty >= 0 && ty < 15) {
                     cou++;
-                    if(mBoard[tx][ty] == tColor && !space) {
+                    if(mBoard[tx][ty] == tColor * color && !space) {
                         dis++;
                     } else if(mBoard[tx][ty] != ChessPoint.NULL) {
                         lrm--;
@@ -137,6 +137,8 @@ public class ComputerPlayer extends BasePlayer {
             }
             //如果小于5说明这条线怎么放都不能凑成5个，所以不得分
             if(cou >= 5) {
+//                int s = EvaluateUtil.getEvaluate(dis, lrm) + tColor * 10;
+//                score = s > score ? s : score;
                 score += EvaluateUtil.getEvaluate(dis, lrm) + tColor * 10;
             }
         }

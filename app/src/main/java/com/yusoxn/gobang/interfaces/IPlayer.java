@@ -2,6 +2,8 @@ package com.yusoxn.gobang.interfaces;
 
 import com.yusoxn.gobang.bean.ChessPoint;
 
+import java.util.List;
+
 /**
  * 玩家接口
  * <p>
@@ -43,9 +45,14 @@ public interface IPlayer {
     void setChessPosition(ChessPoint chessPosition);
 
     /**
-     * 设置当前棋盘状态
+     * 设置当前已下了的棋子
      *
-     * @param board
+     * @param chessList
      */
-    void setChessBoard(int[][] board);
+    void setChessBoard(List<ChessPoint> chessList);
+
+    /**
+     * 对棋盘做初始化
+     */
+    void initChessBoard();
 }

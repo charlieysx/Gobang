@@ -46,6 +46,15 @@ public class GameView extends View {
      */
     private Paint mFillPaint = new Paint();
     /**
+     * 白色画笔
+     */
+    private Paint mWhitePaint = new Paint();
+    /**
+     * 黑色画笔
+     */
+    private Paint mBlackPaint = new Paint();
+
+    /**
      * 黑白棋子,选择框
      */
     private Bitmap mWhiteChess = null;
@@ -109,6 +118,28 @@ public class GameView extends View {
         mFillPaint.setDither(true);
         //设置为空心
         mFillPaint.setStyle(Paint.Style.FILL);
+
+        //初始化白色画笔
+        mWhitePaint.setColor(Color.WHITE);
+        //设置抗锯齿
+        mWhitePaint.setAntiAlias(true);
+        //设置防抖动
+        mWhitePaint.setDither(true);
+        //设置为空心
+        mWhitePaint.setStyle(Paint.Style.FILL);
+        //设置字体大小
+        mWhitePaint.setTextSize(16);
+
+        //初始化黑色画笔
+        mBlackPaint.setColor(Color.BLACK);
+        //设置抗锯齿
+        mBlackPaint.setAntiAlias(true);
+        //设置防抖动
+        mBlackPaint.setDither(true);
+        //设置为空心
+        mBlackPaint.setStyle(Paint.Style.FILL);
+        //设置字体大小
+        mBlackPaint.setTextSize(16);
 
         //初始化棋子,选择框
         mWhiteChess = BitmapFactory.decodeResource(getResources(), R.mipmap.icon_white);
@@ -229,10 +260,18 @@ public class GameView extends View {
     private synchronized void drawChess(Canvas canvas) {
         List<ChessPoint> tPoint = new ArrayList<>();
         tPoint.addAll(points);
+        int pos = 1;
         for (ChessPoint point : tPoint) {
+            //绘制棋子
             canvas.drawBitmap((point.color == ChessPoint.BLACK) ? mBlackChess : mWhiteChess,
                     (point.x + (1 - ChessScale) / 2) * mLineHeight,
                     (point.y + (1 - ChessScale) / 2) * mLineHeight, null);
+            //绘制数字(第几个下的子)
+            canvas.drawText(String.valueOf(pos),
+                    (point.x + 0.4f) * mLineHeight,
+                    (point.y + 0.5f) * mLineHeight,
+                    (point.color == ChessPoint.BLACK) ? mWhitePaint : mBlackPaint);
+            pos++;
         }
         tPoint.clear();
     }

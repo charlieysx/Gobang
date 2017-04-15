@@ -17,7 +17,7 @@ public class EvaluateUtil {
     /**
      * 最大的分数(五子连珠可获得该分数)
      */
-    public static int MAXEVALUATE = 10000;
+    public static int MAX_EVALUATE = 1000000;
 
     public static void init() {
         evaluates = new SparseArray<>();
@@ -27,9 +27,9 @@ public class EvaluateUtil {
         //比如数组中所有的0下标对应的分数都是0，因为下标0表示两端没有空格，即没有下子的地方，无论如何都构不成5子，所以不得分
         //设置的分数值不是很准确
         evaluates.append(1, new Integer[]{0, 10, 100});
-        evaluates.append(2, new Integer[]{0, 1250, 2500});
-        evaluates.append(3, new Integer[]{0, 2500, 4500});
-        evaluates.append(4, new Integer[]{0, 5000, 9000});
+        evaluates.append(2, new Integer[]{0, 1000, 2500});
+        evaluates.append(3, new Integer[]{0, 2000, 4500});
+        evaluates.append(4, new Integer[]{0, 4000, 18000});
     }
 
     /**
@@ -39,9 +39,9 @@ public class EvaluateUtil {
      * @param lrm
      * @return
      */
-    public static int getEvaluate(int dis, int lrm) {
+    public static synchronized int getEvaluate(int dis, int lrm) {
         if (dis >= 5) {
-            return MAXEVALUATE;
+            return MAX_EVALUATE;
         }
         return evaluates.get(dis)[lrm];
     }
