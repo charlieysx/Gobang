@@ -52,8 +52,13 @@ public class AIPlayer extends BasePlayer {
 
     @Override
     public ChessPoint getChessPosition() {
+        if(mPosList.size() > 0) {
+            //这是我方刚下的棋子
+            ChessPoint chess = mPosList.get(0);
+            updateScore(chess.x, chess.y);
+        }
         if (ePosList.size() > 0) {
-            //这是上一步棋子，也就是对方刚下的棋子
+            //这是对方刚下的棋子
             ChessPoint chess = ePosList.get(0);
             updateScore(chess.x, chess.y);
         }
@@ -64,7 +69,6 @@ public class AIPlayer extends BasePlayer {
         Random random = new Random();
         int p = random.nextInt(goodPos.size());
         goodPos.get(p).color = color;
-        updateScore(goodPos.get(p).x, goodPos.get(p).y);
 
         return goodPos.get(p);
     }
@@ -119,7 +123,6 @@ public class AIPlayer extends BasePlayer {
                         emptyPosList.add(new ChessPoint(i, j, 0));
                         return emptyPosList;
                     }
-                    Log.i("Rank", rank + ".." + i + ".." + j);
                     rankPosList.get(rank).add(new ChessPoint(i, j, 0));
                 }
             }
@@ -132,8 +135,7 @@ public class AIPlayer extends BasePlayer {
                 for (int j = 0; j < chessPoints.size(); ++j) {
                     emptyPosList.add(chessPoints.get(j));
                 }
-                if(emptyPosList.size() > 0) {
-                    Log.i("Rank", i + "..");
+                if (emptyPosList.size() > 0) {
                     return emptyPosList;
                 }
             }
@@ -229,6 +231,7 @@ public class AIPlayer extends BasePlayer {
      * @param y
      */
     private void updateScore(int x, int y) {
+        Log.i("updateScore", x + ".." + y);
 
         for (int i = 0; i < 8; i += 2) {
             //分别检测同一线上的两个方向
@@ -274,61 +277,44 @@ public class AIPlayer extends BasePlayer {
     private synchronized int getScore(int x, int y, int tColor) {
         int[] consecutive = new int[4];
         int[] spaces = new int[4];
+
         for (int i = 0; i < 8; i += 2) {
-            //计数用，检查每个方向，开始为1，也就是它本身
-            int dis = 1;
-            //表示两端的空格数
+            //两端的空格数
             int lrm = 2;
-            //记录该线上能放tColor和已放tColor的棋子个数，直到不能放为止
+            //这条线上最多可以连成几个同色棋子
             int cou = 1;
-            //记录是否遇到空格了
-            boolean space = false;
+            //以x，y为中心连续的同色棋子个数
+            int dis = 1;
             //分别检测同一线上的两个方向
-            int tx = x;
-            int ty = y;
-            for (int j = 0; j < 4; ++j) {
-                tx += dir[i][0];
-                ty += dir[i][1];
-                if (tx >= 0 && tx < 15 && ty >= 0 && ty < 15) {
-                    cou++;
-                    if (mBoard[tx][ty] == tColor && !space) {
-                        dis++;
-                    } else if (mBoard[tx][ty] == -tColor) {
-                        if(!space) {
-                            lrm--;
-                            cou--;
+            for (int k = 0; k < 2; ++k) {
+                int tx = x;
+                int ty = y;
+                //是否遇到空格
+                boolean space = false;
+                //一个方向检测4个棋子
+                for (int j = 0; j < 4; ++j) {
+                    tx += dir[i + k][0];
+                    ty += dir[i + k][1];
+
+                    if (tx >= 0 && tx < 15 && ty >= 0 && ty < 15) {
+                        if(mBoard[tx][ty] == tColor) {
+                            cou++;
+                            if(!space) {
+                                dis++;
+                            }
+                        } else if(mBoard[tx][ty] == -tColor) {
+                            if(!space) {
+                                lrm--;
+                            }
+                            break;
+                        } else {
+                            cou++;
+                            space = true;
                         }
-                        break;
                     } else {
-                        space = true;
-                    }
-                } else {
-                    lrm--;
-                    break;
-                }
-            }
-            tx = x;
-            ty = y;
-            space = false;
-            for (int j = 0; j < 4; ++j) {
-                tx += dir[i + 1][0];
-                ty += dir[i + 1][1];
-                if (tx >= 0 && tx < 15 && ty >= 0 && ty < 15) {
-                    cou++;
-                    if (mBoard[tx][ty] == tColor && !space) {
-                        dis++;
-                    } else if (mBoard[tx][ty] == -tColor) {
-                        if(!space) {
-                            lrm--;
-                            cou--;
-                        }
+                        lrm--;
                         break;
-                    } else {
-                        space = true;
                     }
-                } else {
-                    lrm--;
-                    break;
                 }
             }
             //如果小于5说明这条线怎么放都不能凑成5个，所以不得分
@@ -337,15 +323,7 @@ public class AIPlayer extends BasePlayer {
                 spaces[i / 2] = lrm;
             }
         }
-        if(tColor == color) {
-            String c = "", s = "";
-            for (int i = 0; i < 4; ++i) {
-                c += consecutive[i] + " ";
-                s += spaces[i] + " ";
-            }
-            Log.i("AIPlayer", "===========================" + x + ".." + y + "=============..." + tColor);
-            Log.i("AIPlayer", c + "\n" + s);
-        }
+
         return EvaluateUtil2.getEvaluate(consecutive, spaces);
     }
 

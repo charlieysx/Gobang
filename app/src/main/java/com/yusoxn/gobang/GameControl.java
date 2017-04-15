@@ -45,11 +45,6 @@ public class GameControl {
     private ChessPoint firstClickPoint;
 
     /**
-     * 已下的棋子数量
-     */
-    private int numOfChess = 0;
-
-    /**
      * 存储该位置的棋子
      */
     private int[][] mBoard;
@@ -112,7 +107,6 @@ public class GameControl {
      * 初始化棋盘的信息
      */
     private void initBoard() {
-        numOfChess = 0;
         currentPlayer = 0;
         mChessList.clear();
         mGameView.resetChessBoard();
@@ -151,7 +145,7 @@ public class GameControl {
                         player.setChessBoard(mChessList);
                     }
                     //如果AI先手，则把棋子放在最中间
-                    if(player.isAI() && numOfChess == 0) {
+                    if(player.isAI() && mChessList.size() == 0) {
                         point = new ChessPoint(7, 7, player.getChessColor());
                     } else {
                         point = player.getChessPosition();
@@ -160,7 +154,6 @@ public class GameControl {
                     mBoard[point.x][point.y] = point.color;
                     mGameView.addChessPoint(point);
                     mGameView.setSelectPoint(point);
-                    numOfChess++;
 
                     //发送消息绘制棋盘信息
                     mHandler.sendEmptyMessage(0);
@@ -224,7 +217,7 @@ public class GameControl {
             }
         }
         //如果棋子数为225，说明没有空格可以下了，表示和棋
-        if (numOfChess == 225) {
+        if (mChessList.size() == 225) {
             mGameListener.onGameOver(null);
             return true;
         }

@@ -86,7 +86,7 @@ public class EvaluateUtil2 {
     private static int[] rank = {FIVE, _FOUR_, FOUR_FOUR, _THREE_FOUR, _THREE_THREE_, _THREE_, _FOUR, _TWO_TWO_TWO_,
             _TWO_TWO_, THREE_THREE, _TWO_, _THREE, _TWO, OTHER, NO_FIVE};
 
-    public static void init() {
+    private static void init() {
         count.clear();
         for (int i = 0; i < 4; ++i) {
             count.append(i + 1, new Integer[]{0, 0, 0});
