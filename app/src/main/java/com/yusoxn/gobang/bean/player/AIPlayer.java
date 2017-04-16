@@ -23,11 +23,11 @@ public class AIPlayer extends BasePlayer {
     private int[][] dir = {
             //左上右下
             {-1, -1}, {1, 1},
-            //上下
-            {-1, 0}, {1, 0},
-            //右上左下
-            {-1, 1}, {1, -1},
             //左右
+            {-1, 0}, {1, 0},
+            //左下右上
+            {-1, 1}, {1, -1},
+            //上下
             {0, -1}, {0, 1}};
 
     private List<ChessPoint> goodPos = new ArrayList<>();
@@ -311,8 +311,22 @@ public class AIPlayer extends BasePlayer {
                             cou++;
                             space = true;
                         }
+                        if((tx == 0 || tx == 14) && i + k != 3) {
+                            if(!space) {
+                                lrm--;
+                            }
+                            break;
+                        }
+                        if((ty == 0 || ty == 14) && i + k != 1) {
+                            if(!space) {
+                                lrm--;
+                            }
+                            break;
+                        }
                     } else {
-                        lrm--;
+                        if(!space) {
+                            lrm--;
+                        }
                         break;
                     }
                 }
