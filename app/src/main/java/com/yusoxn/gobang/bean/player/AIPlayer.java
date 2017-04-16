@@ -264,6 +264,7 @@ public class AIPlayer extends BasePlayer {
     private void update(int x, int y) {
         aiScore[x][y] = getScore(x, y, color);
         humanScore[x][y] = getScore(x, y, -color);
+        Log.i("updateScore", x + ".." + y + "==========" + aiScore[x][y] + "..." + humanScore[x][y]);
     }
 
     /**
@@ -311,19 +312,15 @@ public class AIPlayer extends BasePlayer {
                             cou++;
                             space = true;
                         }
-                        if((tx == 0 || tx == 14) && i + k != 3) {
-                            if(!space) {
-                                lrm--;
-                            }
-                            break;
-                        }
-                        if((ty == 0 || ty == 14) && i + k != 1) {
-                            if(!space) {
-                                lrm--;
-                            }
-                            break;
-                        }
                     } else {
+                        if(!space) {
+                            lrm--;
+                        }
+                        break;
+                    }
+                    int tempX = tx + dir[i + k][0];
+                    int tempY = ty + dir[i + k][1];
+                    if(tempX < 0 || tempX >= 15 || tempY < 0 || tempY >= 15) {
                         if(!space) {
                             lrm--;
                         }
