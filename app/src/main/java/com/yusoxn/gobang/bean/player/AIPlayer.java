@@ -30,8 +30,6 @@ public class AIPlayer extends BasePlayer {
             //上下
             {0, -1}, {0, 1}};
 
-    private List<ChessPoint> goodPos = new ArrayList<>();
-
     private int[][] aiScore = new int[15][15];
     private int[][] humanScore = new int[15][15];
 
@@ -42,7 +40,6 @@ public class AIPlayer extends BasePlayer {
     @Override
     public void initChessBoard() {
         super.initChessBoard();
-        goodPos.clear();
         for (int i = 0; i < 15; ++i) {
             for (int j = 0; j < 15; ++j) {
                 aiScore[i][j] = humanScore[i][j] = 0;
@@ -62,15 +59,10 @@ public class AIPlayer extends BasePlayer {
             ChessPoint chess = ePosList.get(0);
             updateScore(chess.x, chess.y);
         }
-        goodPos.clear();
-        goodPos.addAll(getEmptyPosList(color));
 
         Log.i("Player", playerName + "下棋");
-        Random random = new Random();
-        int p = random.nextInt(goodPos.size());
-        goodPos.get(p).color = color;
 
-        return goodPos.get(p);
+        return search(1);
     }
 
     @Override
@@ -88,7 +80,119 @@ public class AIPlayer extends BasePlayer {
      * @return
      */
     private int alphaBeta(int depth, int alpha, int beta, int tColor) {
-        return 0;
+        int role = color * tColor;
+        int score = evaluate(role);
+        int ai = 0;
+        int human = 0;
+        if(tColor == 1) {
+            ai = score;
+        } else {
+            human = score;
+        }
+        int rank = EvaluateUtil2.getRank(ai, human);
+        if(depth <= 0 || isGameOver() || rank == 0 || rank == 1) {
+            return score;
+        }
+        int best = EvaluateUtil2.MIN;
+        List<ChessPoint> emptyPosList = getEmptyPosList(color);
+        for(ChessPoint chess : emptyPosList) {
+            move(chess.x, chess.y, color);
+            int value = -alphaBeta(depth - 1, -beta, -1 * (best > alpha ? best : alpha), -tColor);
+            backMove(chess.x, chess.y);
+            if(value >= best) {
+                best = value;
+            }
+//            if(value >= beta) {
+//                return value;
+//            }
+        }
+        return best;
+    }
+
+    private ChessPoint search(int depth) {
+        List<ChessPoint> result = new ArrayList<>();
+
+        int best = EvaluateUtil2.MIN;
+        List<ChessPoint> emptyPosList = getEmptyPosList(color);
+        for(ChessPoint chess : emptyPosList) {
+            move(chess.x, chess.y, color);
+            int value = -alphaBeta(depth - 1, -EvaluateUtil2.MAX, -best, -1);
+            backMove(chess.x, chess.y);
+            if(value == best) {
+                result.add(new ChessPoint(chess.x, chess.y, color));
+            }
+            if(value > best) {
+                best = value;
+                result.clear();
+                result.add(new ChessPoint(chess.x, chess.y, color));
+            }
+        }
+
+        Log.i("AIPlayer", result.size() + "...");
+        Random random = new Random();
+        int index = random.nextInt(result.size());
+        for(ChessPoint chess : result) {
+            Log.i("AIPlayer", chess.x + "..." + chess.y);
+        }
+
+        return result.get(index);
+    }
+
+    private boolean isGameOver() {
+        for(ChessPoint chess : mPosList) {
+            if(isGameOver(chess)) {
+                return true;
+            }
+        }
+        for(ChessPoint chess : ePosList) {
+            if(isGameOver(chess)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 检查下了该棋子后是否游戏结束
+     *
+     * @param point return
+     */
+    private boolean isGameOver(ChessPoint point) {
+        for (int i = 0; i < 8; i += 2) {
+            //计数用，检查每个方向，开始为1，也就是它本身
+            int dis = 1;
+            //分别检测同一线上的两个方向
+            int x = point.x;
+            int y = point.y;
+            while (true) {
+                x += dir[i][0];
+                y += dir[i][1];
+                if(x >= 0 && x < 15 && y >= 0 && y < 15 && mBoard[x][y] == point.color) {
+                    dis++;
+                    if(dis == 5) {
+                        return true;
+                    }
+                } else {
+                    break;
+                }
+            }
+            x = point.x;
+            y = point.y;
+            while (true) {
+                x += dir[i + 1][0];
+                y += dir[i + 1][1];
+                if(x >= 0 && x < 15 && y >= 0 && y < 15 && mBoard[x][y] == point.color) {
+                    dis++;
+                    if(dis == 5) {
+                        return true;
+                    }
+                } else {
+                    break;
+                }
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -128,14 +232,14 @@ public class AIPlayer extends BasePlayer {
             }
         }
         if (rankPosList.get(1).size() > 0) {
-            emptyPosList.add(rankPosList.get(1).get(0));
+            emptyPosList.addAll(rankPosList.get(1));
         } else {
             for (int i = 2; i < rankPosList.size(); ++i) {
                 List<ChessPoint> chessPoints = rankPosList.get(i);
                 for (int j = 0; j < chessPoints.size(); ++j) {
                     emptyPosList.add(chessPoints.get(j));
                 }
-                if (emptyPosList.size() > 0) {
+                if (emptyPosList.size() >= 5) {
                     return emptyPosList;
                 }
             }
@@ -231,7 +335,6 @@ public class AIPlayer extends BasePlayer {
      * @param y
      */
     private void updateScore(int x, int y) {
-        Log.i("updateScore", x + ".." + y);
 
         for (int i = 0; i < 8; i += 2) {
             //分别检测同一线上的两个方向
@@ -264,7 +367,6 @@ public class AIPlayer extends BasePlayer {
     private void update(int x, int y) {
         aiScore[x][y] = getScore(x, y, color);
         humanScore[x][y] = getScore(x, y, -color);
-        Log.i("updateScore", x + ".." + y + "==========" + aiScore[x][y] + "..." + humanScore[x][y]);
     }
 
     /**
@@ -355,6 +457,8 @@ public class AIPlayer extends BasePlayer {
                 }
             }
         }
-        return tColor * (aiMaxScore - humanMaxScore);
+
+        return Math.max(aiMaxScore, humanMaxScore);
+//        return tColor * (aiMaxScore - humanMaxScore);
     }
 }

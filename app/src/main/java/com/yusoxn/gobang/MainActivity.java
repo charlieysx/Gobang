@@ -42,8 +42,8 @@ public class MainActivity extends AppCompatActivity {
         mControl = new GameControl(mGameView);
 
         BasePlayer[] players = new BasePlayer[2];
-        players[0] = new AIPlayer("小熊", ChessPoint.BLACK);
-        players[1] = new HumanPlayer("yusxon", ChessPoint.WHITE);
+        players[0] = new HumanPlayer("小熊", ChessPoint.BLACK);
+        players[1] = new AIPlayer("yusxon", ChessPoint.WHITE);
         mControl.setPlayers(players[0], players[1]);
         listener();
     }
